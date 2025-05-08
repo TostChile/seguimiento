@@ -1,0 +1,30 @@
+<h2>Rastrea tu pedido</h2>
+<p>Ingresa el número de tu pedido:</p>
+<form onsubmit="buscarEnTodas(); return false;" style="margin-top: 10px;">
+  <input id="codigo-pedido" placeholder="Ej: #1234" style="width: 250px; height: 30px; border: 1px solid #ccc; border-radius: 5px; padding: 5px;">
+  <button type="submit" style="background-color: #4CAF50; color: white; border: none; border-radius: 5px; padding: 6px 12px;">Buscar</button>
+</form>
+
+<p style="font-size: 12px; color: gray;">* Se abrirán hasta 3 pestañas con la información de seguimiento.</p>
+
+<script>
+function buscarEnTodas() {
+  const code = document.getElementById('codigo-pedido').value.trim().replace(/^#/, '');
+  if (!code) {
+    alert('Por favor ingresa tu número de pedido.');
+    return;
+  }
+
+  // SimpliRoute
+  const urlSimpliroute = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(code);
+  window.open(urlSimpliroute, '_blank');
+
+  // Alasxpress
+  const urlAlas = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(code);
+  window.open(urlAlas, '_blank');
+
+  // Beetrack
+  const urlBeetrack = 'https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw?search=' + encodeURIComponent(code);
+  window.open(urlBeetrack, '_blank');
+}
+</script>

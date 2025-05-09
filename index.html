@@ -39,6 +39,7 @@
 
   <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento.</p>
 
+  <!-- Formulario oculto para DispatchTrack -->
   <form id="form-dispatch" action="https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw" method="POST" target="_blank" style="display: none;">
     <input type="hidden" name="authenticity_token" value="e+mZdEpoOz5sAnNnWJVsAG9BXL0D4KGiUj5Cv5Y7yekqX9Ew1obl0kExGvotO3cJsV96b67hwOUCoUJJR5F0Vw==">
     <input type="hidden" name="search" id="dispatch-search">
@@ -52,18 +53,19 @@
         return;
       }
 
-      // 🔵 1. Enviar a DispatchTrack (POST)
-      const form = document.getElementById('form-dispatch');
-      document.getElementById('dispatch-search').value = codigo.replace(/^TO-/, '');
-      form.submit();
+      const codigoSinPrefijo = codigo.replace(/^TO-/, '');
 
-      // 🟠 2. Abrir SimpliRoute
-      const urlSR = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(codigo);
-      window.open(urlSR, '_blank');
+      // 🔵 DispatchTrack (envío POST)
+      document.getElementById('dispatch-search').value = codigoSinPrefijo;
+      document.getElementById('form-dispatch').submit();
 
-      // 🟣 3. Abrir Alasxpress
-      const urlAX = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
-      window.open(urlAX, '_blank');
+      // 🟠 SimpliRoute (apertura directa por GET)
+      const simplirouteURL = `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigo)}`;
+      window.open(simplirouteURL, '_blank');
+
+      // 🟣 Alasxpress (apertura directa por GET)
+      const alasxpressURL = `https://tracking.alasxpress.com/api/${encodeURIComponent(codigo)}`;
+      window.open(alasxpressURL, '_blank');
     }
   </script>
 

@@ -1,30 +1,120 @@
-<h2>Rastrea tu pedido</h2>
-<p>Ingresa el número de tu pedido:</p>
-<form onsubmit="buscarEnTodas(); return false;" style="margin-top: 10px;">
-  <input id="codigo-pedido" placeholder="Ej: #1234" style="width: 250px; height: 30px; border: 1px solid #ccc; border-radius: 5px; padding: 5px;">
-  <button type="submit" style="background-color: #4CAF50; color: white; border: none; border-radius: 5px; padding: 6px 12px;">Buscar</button>
-</form>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Seguimiento de Pedido</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      display: none;
+      margin-top: 20px;
+    }
+    .loading {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
 
-<p style="font-size: 12px; color: gray;">* Se abrirán hasta 3 pestañas con la información de seguimiento.</p>
+  <h1>Rastrea tu pedido</h1>
+  <p>Ingresa tu número de pedido:</p>
+  <input id="codigo" placeholder="Ej: TO-169973">
+  <button onclick="buscar()">Buscar</button>
 
-<script>
-function buscarEnTodas() {
-  const code = document.getElementById('codigo-pedido').value.trim().replace(/^#/, '');
-  if (!code) {
-    alert('Por favor ingresa tu número de pedido.');
-    return;
-  }
+  <div class="loading" id="estado">Esperando búsqueda...</div>
 
-  // SimpliRoute
-  const urlSimpliroute = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(code);
-  window.open(urlSimpliroute, '_blank');
+  <iframe id="frame1"></iframe>
+  <iframe id="frame2"></iframe>
+  <iframe id="frame3"></iframe>
 
-  // Alasxpress
-  const urlAlas = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(code);
-  window.open(urlAlas, '_blank');
+  <script>
+    async function buscar() {
+      const codigoOriginal = document.getElementById('codigo').value.trim();
+      if (!codigoOriginal) {
+        alert("Ingresa tu número de pedido (Ej: TO-169973).");
+        return;
+      }
 
-  // Beetrack
-  const urlBeetrack = 'https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw?search=' + encodeURIComponent(code);
-  window.open(urlBeetrack, '_blank');
-}
-</script>
+      document.getElementById("estado").innerText = "Buscando en DispatchTrack...";
+      ocultarTodos();
+
+      const codigoDispatch = codigoOriginal.replace(/^TO-/, '');
+
+      try {
+        await mostrarIframe('frame1', `https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw?search=${encodeURIComponent(codigoDispatch)}`, 5000);
+        document.getElementById("estado").innerText = "Resultado encontrado en DispatchTrack.";
+        return;
+      } catch (e) {
+        document.getElementById("estado").innerText = "No encontrado en DispatchTrack, buscando en SimpliRoute...";
+      }
+
+      try {
+        await mostrarIframe('frame2', `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigoOriginal)}`, 5000);
+        document.getElementById("estado").innerText = "Resultado encontrado en SimpliRoute.";
+        return;
+      } catch (e) {
+        document.getElementById("estado").innerText = "No encontrado en SimpliRoute, buscando en Alasxpress...";
+      }
+
+      try {
+        await mostrarIframe('frame3', `https://tracking.alasxpress.com/api/${encodeURIComponent(codigoOriginal)}`, 5000);
+        document.getElementById("estado").innerText = "Resultado encontrado en Alasxpress.";
+        return;
+      } catch (e) {
+        document.getElementById("estado").innerText = "No se pudo encontrar el seguimiento en ninguna plataforma.";
+      }
+    }
+
+    function ocultarTodos() {
+      document.getElementById("frame1").style.display = "none";
+      document.getElementById("frame2").style.display = "none";
+      document.getElementById("frame3").style.display = "none";
+    }
+
+    function mostrarIframe(id, url, timeout) {
+      return new Promise((resolve, reject) => {
+        const iframe = document.getElementById(id);
+        iframe.src = url;
+        iframe.style.display = "none";
+
+        let cargado = false;
+
+        iframe.onload = () => {
+          if (!cargado) {
+            cargado = true;
+            iframe.style.display = "block";
+            resolve();
+          }
+        };
+
+        setTimeout(() => {
+          if (!cargado) {
+            reject(new Error("Timeout"));
+          }
+        }, timeout);
+      });
+    }
+  </script>
+
+</body>
+</html>

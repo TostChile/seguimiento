@@ -20,89 +20,50 @@
       color: white;
       border: none;
     }
-    iframe {
-      width: 100%;
-      height: 600px;
-      border: none;
-      display: none;
-      margin-top: 20px;
-    }
-    .loading {
-      margin-top: 20px;
-      font-size: 14px;
+    .note {
+      font-size: 13px;
       color: #666;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
   <h1>Rastrea tu pedido</h1>
-  <p>Ingresa tu número de pedido:</p>
-  <input id="codigo" placeholder="Ej: TO-169973">
-  <button onclick="buscar()">Buscar</button>
+  <p>Ingresa tu número de pedido (Ej: TO-169973):</p>
 
-  <div class="loading" id="estado">Esperando búsqueda...</div>
+  <form onsubmit="buscar(); return false;">
+    <input id="codigo" placeholder="Ej: TO-169973">
+    <button type="submit">Buscar</button>
+  </form>
 
-  <iframe id="frame1"></iframe>
+  <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento.</p>
+
+  <form id="form-dispatch" action="https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw" method="POST" target="_blank" style="display: none;">
+    <input type="hidden" name="authenticity_token" value="e+mZdEpoOz5sAnNnWJVsAG9BXL0D4KGiUj5Cv5Y7yekqX9Ew1obl0kExGvotO3cJsV96b67hwOUCoUJJR5F0Vw==">
+    <input type="hidden" name="search" id="dispatch-search">
+  </form>
 
   <script>
-    async function buscar() {
-      const codigoOriginal = document.getElementById('codigo').value.trim();
-      if (!codigoOriginal) {
-        alert("Ingresa tu número de pedido (Ej: TO-169973).");
+    function buscar() {
+      const codigo = document.getElementById('codigo').value.trim();
+      if (!codigo) {
+        alert('Por favor, ingresa tu número de pedido.');
         return;
       }
 
-      document.getElementById("estado").innerText = "Buscando en DispatchTrack...";
-      ocultarTodos();
+      // 🔵 1. Enviar a DispatchTrack (POST)
+      const form = document.getElementById('form-dispatch');
+      document.getElementById('dispatch-search').value = codigo.replace(/^TO-/, '');
+      form.submit();
 
-      const codigoDispatch = codigoOriginal.replace(/^TO-/, '');
+      // 🟠 2. Abrir SimpliRoute
+      const urlSR = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(codigo);
+      window.open(urlSR, '_blank');
 
-      // Cargar directamente el resultado del pedido en DispatchTrack
-      const dispatchURL = `https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw/${encodeURIComponent(codigoDispatch)}`;
-      try {
-        await mostrarIframe('frame1', dispatchURL, 5000);
-        document.getElementById("estado").innerText = "Resultado encontrado en DispatchTrack.";
-        return;
-      } catch (e) {
-        document.getElementById("estado").innerText = "No encontrado en DispatchTrack. Abriendo otras plataformas...";
-      }
-
-      // Si no se encontró en Dispatch, abrir SimpliRoute y Alasxpress en nuevas pestañas
-      const simplirouteURL = `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigoOriginal)}`;
-      const alasxpressURL = `https://tracking.alasxpress.com/api/${encodeURIComponent(codigoOriginal)}`;
-      window.open(simplirouteURL, '_blank');
-      window.open(alasxpressURL, '_blank');
-
-      document.getElementById("estado").innerText = "No se encontró en DispatchTrack. Revisa las otras pestañas abiertas.";
-    }
-
-    function ocultarTodos() {
-      document.getElementById("frame1").style.display = "none";
-    }
-
-    function mostrarIframe(id, url, timeout) {
-      return new Promise((resolve, reject) => {
-        const iframe = document.getElementById(id);
-        iframe.src = url;
-        iframe.style.display = "none";
-
-        let cargado = false;
-
-        iframe.onload = () => {
-          if (!cargado) {
-            cargado = true;
-            iframe.style.display = "block";
-            resolve();
-          }
-        };
-
-        setTimeout(() => {
-          if (!cargado) {
-            reject(new Error("Timeout"));
-          }
-        }, timeout);
-      });
+      // 🟣 3. Abrir Alasxpress
+      const urlAX = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
+      window.open(urlAX, '_blank');
     }
   </script>
 

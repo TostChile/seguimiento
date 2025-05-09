@@ -22,7 +22,7 @@
     }
     iframe {
       width: 100%;
-      height: 500px;
+      height: 600px;
       border: none;
       display: none;
       margin-top: 20px;
@@ -44,8 +44,6 @@
   <div class="loading" id="estado">Esperando búsqueda...</div>
 
   <iframe id="frame1"></iframe>
-  <iframe id="frame2"></iframe>
-  <iframe id="frame3"></iframe>
 
   <script>
     async function buscar() {
@@ -60,35 +58,27 @@
 
       const codigoDispatch = codigoOriginal.replace(/^TO-/, '');
 
+      // Cargar directamente el resultado del pedido en DispatchTrack
+      const dispatchURL = `https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw/${encodeURIComponent(codigoDispatch)}`;
       try {
-        await mostrarIframe('frame1', `https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw?search=${encodeURIComponent(codigoDispatch)}`, 5000);
+        await mostrarIframe('frame1', dispatchURL, 5000);
         document.getElementById("estado").innerText = "Resultado encontrado en DispatchTrack.";
         return;
       } catch (e) {
-        document.getElementById("estado").innerText = "No encontrado en DispatchTrack, buscando en SimpliRoute...";
+        document.getElementById("estado").innerText = "No encontrado en DispatchTrack. Abriendo otras plataformas...";
       }
 
-      try {
-        await mostrarIframe('frame2', `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigoOriginal)}`, 5000);
-        document.getElementById("estado").innerText = "Resultado encontrado en SimpliRoute.";
-        return;
-      } catch (e) {
-        document.getElementById("estado").innerText = "No encontrado en SimpliRoute, buscando en Alasxpress...";
-      }
+      // Si no se encontró en Dispatch, abrir SimpliRoute y Alasxpress en nuevas pestañas
+      const simplirouteURL = `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigoOriginal)}`;
+      const alasxpressURL = `https://tracking.alasxpress.com/api/${encodeURIComponent(codigoOriginal)}`;
+      window.open(simplirouteURL, '_blank');
+      window.open(alasxpressURL, '_blank');
 
-      try {
-        await mostrarIframe('frame3', `https://tracking.alasxpress.com/api/${encodeURIComponent(codigoOriginal)}`, 5000);
-        document.getElementById("estado").innerText = "Resultado encontrado en Alasxpress.";
-        return;
-      } catch (e) {
-        document.getElementById("estado").innerText = "No se pudo encontrar el seguimiento en ninguna plataforma.";
-      }
+      document.getElementById("estado").innerText = "No se encontró en DispatchTrack. Revisa las otras pestañas abiertas.";
     }
 
     function ocultarTodos() {
       document.getElementById("frame1").style.display = "none";
-      document.getElementById("frame2").style.display = "none";
-      document.getElementById("frame3").style.display = "none";
     }
 
     function mostrarIframe(id, url, timeout) {

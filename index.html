@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Seguimiento de Pedido</title>
+  <title>Seguimiento de Pedido por Comuna</title>
   <style>
     body {
       font-family: sans-serif;
@@ -31,18 +31,75 @@
 <body>
 
   <h1>Rastrea tu pedido</h1>
-  <p>Ingresa tu número de pedido y selecciona tu región:</p>
+  <p>Ingresa tu número de pedido y selecciona tu comuna:</p>
 
   <form onsubmit="buscar(); return false;">
     <input id="codigo" placeholder="Ej: TO-169973" required>
-    <select id="region">
-      <option value="rm">Región Metropolitana</option>
-      <option value="otras">Otras Regiones</option>
+    <select id="comuna" required>
+      <option value="">-- Selecciona tu comuna --</option>
+      <optgroup label="SimpliRoute">
+        <option>Las Condes</option>
+        <option>Ñuñoa</option>
+        <option>Providencia</option>
+        <option>Santiago</option>
+      </optgroup>
+      <optgroup label="Alasxpress">
+        <option>Alhué</option>
+        <option>Buin</option>
+        <option>Calera de Tango</option>
+        <option>Curacaví</option>
+        <option>El Monte</option>
+        <option>Isla de Maipo</option>
+        <option>Lampa</option>
+        <option>María Pinto</option>
+        <option>Melipilla</option>
+        <option>Padre Hurtado</option>
+        <option>Paine</option>
+        <option>Peñaflor</option>
+        <option>Pirque</option>
+        <option>San José de Maipo</option>
+        <option>San Pedro</option>
+        <option>Talagante</option>
+        <option>Tiltil</option>
+      </optgroup>
+      <optgroup label="DispatchTrack">
+        <option>Colina</option>
+        <option>Conchalí</option>
+        <option>Cerrillos</option>
+        <option>Cerro Navia</option>
+        <option>El Bosque</option>
+        <option>Estación Central</option>
+        <option>Huechuraba</option>
+        <option>Independencia</option>
+        <option>La Cisterna</option>
+        <option>La Florida</option>
+        <option>La Granja</option>
+        <option>La Pintana</option>
+        <option>La Reina</option>
+        <option>Lo Barnechea</option>
+        <option>Lo Espejo</option>
+        <option>Lo Prado</option>
+        <option>Macul</option>
+        <option>Maipú</option>
+        <option>Pedro Aguirre Cerda</option>
+        <option>Peñalolén</option>
+        <option>Puente Alto</option>
+        <option>Pudahuel</option>
+        <option>Quilicura</option>
+        <option>Quinta Normal</option>
+        <option>Recoleta</option>
+        <option>Renca</option>
+        <option>San Bernardo</option>
+        <option>San Joaquín</option>
+        <option>San Miguel</option>
+        <option>San Ramón</option>
+        <option>Vitacura</option>
+      </optgroup>
     </select>
     <button type="submit">Buscar</button>
   </form>
 
-  <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento según tu región.</p>
+  <p class="note">Se abrirá la plataforma de seguimiento correspondiente según tu comuna.</p>
 
   <!-- Formulario oculto para DispatchTrack -->
   <form id="form-dispatch" action="https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw" method="POST" target="_blank" style="display: none;">
@@ -50,36 +107,34 @@
     <input type="hidden" name="search" id="dispatch-search">
   </form>
 
-  <!-- Formulario oculto para SimpliRoute -->
-  <form id="form-simpliroute" method="GET" target="_blank" style="display: none;">
-    <input type="hidden" id="simpliroute-code">
-  </form>
-
   <script>
+    const SIMPLIROUTE = ["Las Condes", "Ñuñoa", "Providencia", "Santiago"];
+    const ALASXPRESS = ["Alhué", "Buin", "Calera de Tango", "Curacaví", "El Monte", "Isla de Maipo", "Lampa", "María Pinto", "Melipilla", "Padre Hurtado", "Paine", "Peñaflor", "Pirque", "San José de Maipo", "San Pedro", "Talagante", "Tiltil"];
+    const DISPATCHTRACK = ["Colina", "Conchalí", "Cerrillos", "Cerro Navia", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Pedro Aguirre Cerda", "Peñalolén", "Puente Alto", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Bernardo", "San Joaquín", "San Miguel", "San Ramón", "Vitacura"];
+
     function buscar() {
       const codigo = document.getElementById('codigo').value.trim();
-      const region = document.getElementById('region').value;
+      const comuna = document.getElementById('comuna').value;
 
-      if (!codigo) {
-        alert('Por favor, ingresa tu número de pedido.');
+      if (!codigo || !comuna) {
+        alert("Por favor ingresa el número de pedido y selecciona una comuna.");
         return;
       }
 
-      if (region === 'rm') {
-        // 1. DispatchTrack por POST
+      if (DISPATCHTRACK.includes(comuna)) {
         const codigoDispatch = codigo.replace(/^TO-/, '');
         document.getElementById('dispatch-search').value = codigoDispatch;
         document.getElementById('form-dispatch').submit();
+      }
 
-        // 2. SimpliRoute por GET
-        const formSR = document.getElementById('form-simpliroute');
-        formSR.action = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(codigo);
-        formSR.submit();
+      if (SIMPLIROUTE.includes(comuna)) {
+        const srURL = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(codigo);
+        window.open(srURL, '_blank');
+      }
 
-      } else {
-        // Solo Alasxpress
-        const urlAX = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
-        window.open(urlAX, '_blank');
+      if (ALASXPRESS.includes(comuna)) {
+        const axURL = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
+        window.open(axURL, '_blank');
       }
     }
   </script>

@@ -9,7 +9,7 @@
       text-align: center;
       padding: 30px;
     }
-    input, button {
+    input, select, button {
       padding: 10px;
       font-size: 16px;
       border-radius: 5px;
@@ -19,6 +19,7 @@
       background-color: #4CAF50;
       color: white;
       border: none;
+      cursor: pointer;
     }
     .note {
       font-size: 13px;
@@ -30,14 +31,18 @@
 <body>
 
   <h1>Rastrea tu pedido</h1>
-  <p>Ingresa tu número de pedido (Ej: TO-169973):</p>
+  <p>Ingresa tu número de pedido y selecciona tu región:</p>
 
   <form onsubmit="buscar(); return false;">
-    <input id="codigo" placeholder="Ej: TO-169973">
+    <input id="codigo" placeholder="Ej: TO-169973" required>
+    <select id="region">
+      <option value="rm">Región Metropolitana</option>
+      <option value="otras">Otras Regiones</option>
+    </select>
     <button type="submit">Buscar</button>
   </form>
 
-  <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento.</p>
+  <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento según tu región.</p>
 
   <!-- Formulario oculto para DispatchTrack -->
   <form id="form-dispatch" action="https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw" method="POST" target="_blank" style="display: none;">
@@ -45,27 +50,37 @@
     <input type="hidden" name="search" id="dispatch-search">
   </form>
 
+  <!-- Formulario oculto para SimpliRoute -->
+  <form id="form-simpliroute" method="GET" target="_blank" style="display: none;">
+    <input type="hidden" id="simpliroute-code">
+  </form>
+
   <script>
     function buscar() {
       const codigo = document.getElementById('codigo').value.trim();
+      const region = document.getElementById('region').value;
+
       if (!codigo) {
         alert('Por favor, ingresa tu número de pedido.');
         return;
       }
 
-      const codigoSinPrefijo = codigo.replace(/^TO-/, '');
+      if (region === 'rm') {
+        // 1. DispatchTrack por POST
+        const codigoDispatch = codigo.replace(/^TO-/, '');
+        document.getElementById('dispatch-search').value = codigoDispatch;
+        document.getElementById('form-dispatch').submit();
 
-      // 🔵 DispatchTrack (envío POST)
-      document.getElementById('dispatch-search').value = codigoSinPrefijo;
-      document.getElementById('form-dispatch').submit();
+        // 2. SimpliRoute por GET
+        const formSR = document.getElementById('form-simpliroute');
+        formSR.action = 'https://livetracking.simpliroute.com/widget/account/45260/tracking/' + encodeURIComponent(codigo);
+        formSR.submit();
 
-      // 🟠 SimpliRoute (apertura directa por GET)
-      const simplirouteURL = `https://livetracking.simpliroute.com/widget/account/45260/tracking/${encodeURIComponent(codigo)}`;
-      window.open(simplirouteURL, '_blank');
-
-      // 🟣 Alasxpress (apertura directa por GET)
-      const alasxpressURL = `https://tracking.alasxpress.com/api/${encodeURIComponent(codigo)}`;
-      window.open(alasxpressURL, '_blank');
+      } else {
+        // Solo Alasxpress
+        const urlAX = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
+        window.open(urlAX, '_blank');
+      }
     }
   </script>
 

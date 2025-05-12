@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <link href='https://fonts.googleapis.com/css2?family=Poppins&display=swap' rel='stylesheet'>
   <meta charset="UTF-8">
-  <title>Seguimiento de Pedido por Comuna</title>
+  <title>Seguimiento de Pedido</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: 'Poppins', sans-serif;
       text-align: center;
       padding: 30px;
     }
@@ -16,7 +17,7 @@
       margin: 5px;
     }
     button {
-      background-color: #4CAF50;
+      background-color: #fe5b35;
       color: white;
       border: none;
       cursor: pointer;
@@ -31,77 +32,84 @@
 <body>
 
   <h1>Rastrea tu pedido</h1>
-  <p>Ingresa tu número de pedido y selecciona tu comuna:</p>
-
   <form onsubmit="buscar(); return false;">
-    <input id="codigo" placeholder="Ej: TO-169973" required>
-    <select id="comuna" required>
-      <option value="">-- Selecciona tu comuna --</option>
-      <optgroup label="SimpliRoute">
-        <option>Las Condes</option>
-        <option>Ñuñoa</option>
-        <option>Providencia</option>
-        <option>Santiago</option>
-      </optgroup>
-      <optgroup label="Alasxpress">
-        <option>Alhué</option>
-        <option>Buin</option>
-        <option>Calera de Tango</option>
-        <option>Curacaví</option>
-        <option>El Monte</option>
-        <option>Isla de Maipo</option>
-        <option>Lampa</option>
-        <option>María Pinto</option>
-        <option>Melipilla</option>
-        <option>Padre Hurtado</option>
-        <option>Paine</option>
-        <option>Peñaflor</option>
-        <option>Pirque</option>
-        <option>San José de Maipo</option>
-        <option>San Pedro</option>
-        <option>Talagante</option>
-        <option>Tiltil</option>
-      </optgroup>
-      <optgroup label="DispatchTrack">
-        <option>Colina</option>
-        <option>Conchalí</option>
-        <option>Cerrillos</option>
-        <option>Cerro Navia</option>
-        <option>El Bosque</option>
-        <option>Estación Central</option>
-        <option>Huechuraba</option>
-        <option>Independencia</option>
-        <option>La Cisterna</option>
-        <option>La Florida</option>
-        <option>La Granja</option>
-        <option>La Pintana</option>
-        <option>La Reina</option>
-        <option>Lo Barnechea</option>
-        <option>Lo Espejo</option>
-        <option>Lo Prado</option>
-        <option>Macul</option>
-        <option>Maipú</option>
-        <option>Pedro Aguirre Cerda</option>
-        <option>Peñalolén</option>
-        <option>Puente Alto</option>
-        <option>Pudahuel</option>
-        <option>Quilicura</option>
-        <option>Quinta Normal</option>
-        <option>Recoleta</option>
-        <option>Renca</option>
-        <option>San Bernardo</option>
-        <option>San Joaquín</option>
-        <option>San Miguel</option>
-        <option>San Ramón</option>
-        <option>Vitacura</option>
-      </optgroup>
-    </select>
+    <input id="codigo" placeholder="Ej: TO-169973" required><br>
+    <select id="zona" onchange="mostrarComunas()" required>
+      <option value="">-- Selecciona tu zona --</option>
+      <option value="rm">Región Metropolitana</option>
+      <option value="otras">Otras Regiones</option>
+    </select><br>
+
+    <div id="selector-comuna" style="display:none;">
+      <select id="comuna">
+        <option value="">-- Selecciona tu comuna --</option>
+        <optgroup label="SimpliRoute">
+          <option>Las Condes</option>
+          <option>Ñuñoa</option>
+          <option>Providencia</option>
+          <option>Santiago</option>
+        </optgroup>
+        <optgroup label="Alasxpress">
+          <option>Alhué</option>
+          <option>Buin</option>
+          <option>Calera de Tango</option>
+          <option>Curacaví</option>
+          <option>El Monte</option>
+          <option>Isla de Maipo</option>
+          <option>Lampa</option>
+          <option>María Pinto</option>
+          <option>Melipilla</option>
+          <option>Padre Hurtado</option>
+          <option>Paine</option>
+          <option>Peñaflor</option>
+          <option>Pirque</option>
+          <option>San José de Maipo</option>
+          <option>San Pedro</option>
+          <option>Talagante</option>
+          <option>Tiltil</option>
+        </optgroup>
+        <optgroup label="Nicelogistic">
+          <option>Colina</option>
+          <option>Conchalí</option>
+          <option>Cerrillos</option>
+          <option>Cerro Navia</option>
+          <option>El Bosque</option>
+          <option>Estación Central</option>
+          <option>Huechuraba</option>
+          <option>Independencia</option>
+          <option>La Cisterna</option>
+          <option>La Florida</option>
+          <option>La Granja</option>
+          <option>La Pintana</option>
+          <option>La Reina</option>
+          <option>Lo Barnechea</option>
+          <option>Lo Espejo</option>
+          <option>Lo Prado</option>
+          <option>Macul</option>
+          <option>Maipú</option>
+          <option>Pedro Aguirre Cerda</option>
+          <option>Peñalolén</option>
+          <option>Puente Alto</option>
+          <option>Pudahuel</option>
+          <option>Quilicura</option>
+          <option>Quinta Normal</option>
+          <option>Recoleta</option>
+          <option>Renca</option>
+          <option>San Bernardo</option>
+          <option>San Joaquín</option>
+          <option>San Miguel</option>
+          <option>San Ramón</option>
+          <option>Vitacura</option>
+        </optgroup>
+      </select>
+    </div>
+    <br>
     <button type="submit">Buscar</button>
   </form>
 
-  <p class="note">Se abrirá la plataforma de seguimiento correspondiente según tu comuna.</p>
+  <p class="note">Se abrirán nuevas pestañas con el resultado del seguimiento según tu zona.</p>
 
-  <!-- Formulario oculto para DispatchTrack -->
+  <!-- Formulario oculto para Nicelogistic (DispatchTrack) -->
   <form id="form-dispatch" action="https://mtransporte.dispatchtrack.com/widget/jhJCY3V19f9Tl3PN_3mRbw" method="POST" target="_blank" style="display: none;">
     <input type="hidden" name="authenticity_token" value="e+mZdEpoOz5sAnNnWJVsAG9BXL0D4KGiUj5Cv5Y7yekqX9Ew1obl0kExGvotO3cJsV96b67hwOUCoUJJR5F0Vw==">
     <input type="hidden" name="search" id="dispatch-search">
@@ -110,18 +118,31 @@
   <script>
     const SIMPLIROUTE = ["Las Condes", "Ñuñoa", "Providencia", "Santiago"];
     const ALASXPRESS = ["Alhué", "Buin", "Calera de Tango", "Curacaví", "El Monte", "Isla de Maipo", "Lampa", "María Pinto", "Melipilla", "Padre Hurtado", "Paine", "Peñaflor", "Pirque", "San José de Maipo", "San Pedro", "Talagante", "Tiltil"];
-    const DISPATCHTRACK = ["Colina", "Conchalí", "Cerrillos", "Cerro Navia", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Pedro Aguirre Cerda", "Peñalolén", "Puente Alto", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Bernardo", "San Joaquín", "San Miguel", "San Ramón", "Vitacura"];
+    const NICELOGISTIC = ["Colina", "Conchalí", "Cerrillos", "Cerro Navia", "El Bosque", "Estación Central", "Huechuraba", "Independencia", "La Cisterna", "La Florida", "La Granja", "La Pintana", "La Reina", "Lo Barnechea", "Lo Espejo", "Lo Prado", "Macul", "Maipú", "Pedro Aguirre Cerda", "Peñalolén", "Puente Alto", "Pudahuel", "Quilicura", "Quinta Normal", "Recoleta", "Renca", "San Bernardo", "San Joaquín", "San Miguel", "San Ramón", "Vitacura"];
+
+    function mostrarComunas() {
+      const zona = document.getElementById("zona").value;
+      const comunaDiv = document.getElementById("selector-comuna");
+      comunaDiv.style.display = zona === "rm" ? "block" : "none";
+    }
 
     function buscar() {
       const codigo = document.getElementById('codigo').value.trim();
+      const zona = document.getElementById('zona').value;
       const comuna = document.getElementById('comuna').value;
 
-      if (!codigo || !comuna) {
-        alert("Por favor ingresa el número de pedido y selecciona una comuna.");
+      if (!codigo || !zona || (zona === "rm" && !comuna)) {
+        alert("Por favor completa todos los campos.");
         return;
       }
 
-      if (DISPATCHTRACK.includes(comuna)) {
+      if (zona === "otras") {
+        const axURL = 'https://tracking.alasxpress.com/api/' + encodeURIComponent(codigo);
+        window.open(axURL, '_blank');
+        return;
+      }
+
+      if (NICELOGISTIC.includes(comuna)) {
         const codigoDispatch = codigo.replace(/^TO-/, '');
         document.getElementById('dispatch-search').value = codigoDispatch;
         document.getElementById('form-dispatch').submit();
